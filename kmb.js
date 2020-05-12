@@ -29,9 +29,9 @@ module.exports = function({
 			json.response
 				.map(eta => eta.ex)
 				.map(strDate => 
-					Moment(strDate, "YYYY-MM-DD HH:mm:ss")
-						// .utcOffset(8)
-						// .subtract(8, "hours")
+					Moment.utc(strDate, "YYYY-MM-DD HH:mm:ss")
+						.utcOffset(8)
+						.subtract(8, "hours")
 				)
 		);
 };

@@ -34,17 +34,22 @@ app.get('/:stop/:route', cache('30 seconds'), async (req, res) => {
 
         const msgBlock = MessageComposer({
             stop: stopName, 
-            items: entries.map(m => (
+            routes: [
                 {
                     route: routeName,
-                    remain: MomentDiff(m),
-                    exact: m,
-                }
-            )),
+                    etaItems: entries.map(m => (
+                        {
+                            remain: MomentDiff(m),
+                            exact: m,
+                        }
+                    )),
+                },
+            ],
         });
 
         res.send({ blocks: [ msgBlock ] }).end();
     } catch (e) {
+        console.error(e);
         res.status(500).send(e).end();
     }
     
