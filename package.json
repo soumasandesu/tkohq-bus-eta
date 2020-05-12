@@ -1,0 +1,23 @@
+{
+  "name": "tkohq-bus-eta",
+  "version": "0.1.0",
+  "main": "index.js",
+  "author": "Charles Poon<cypoon@hktv.com.hk>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "apicache": "^1.5.3",
+    "express": "^4.17.1",
+    "moment": "^2.25.3",
+    "node-cache": "^5.1.0",
+    "node-fetch": "^2.6.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "start:test": "nodemon --exec node --inspect-brk index.js"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.2",
+    "nodemon": "^2.0.3"
+  }
+}

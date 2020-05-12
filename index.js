@@ -1,0 +1,62 @@
+const express = require("express");
+const apicache = require("apicache");
+
+const Cached = require("./cached.js");
+const Routes = require("./routes.js");
+const MomentDiff = require("./momentDiff.js");
+const MessageComposer = require("./messageComposer.js");
+
+const app = express();
+const cache = apicache.options({
+    headers: {
+        'cache-control': 'no-cache',
+    },
+}).middleware;
+
+app.get('/', (req, res) => {
+    res.json("ok");
+});
+
+// ===
+
+app.get('/:stop/:route', cache('30 seconds'), async (req, res) => {
+
+    try {
+        const routeKey = `${req.params.stop}_${req.params.route}`;
+        const route = Routes[routeKey];
+        if (typeof route === "undefined") {
+            res.status(400).end();
+            return;
+        }
+
+        const { func, stopName, routeName } = route;
+        const entries = await Cached(routeKey, func);
+
+        const msgBlock = MessageComposer({
+            stop: stopName, 
+            items: entries.map(m => (
+                {
+                    route: routeName,
+                    remain: MomentDiff(m),
+                    exact: m,
+                }
+            )),
+        });
+
+        res.send({ blocks: [ msgBlock ] }).end();
+    } catch (e) {
+        res.status(500).send(e).end();
+    }
+    
+});
+
+// ===
+
+app.get('*', (req, res) => {
+    res.status(204).end();
+});
+
+app.listen(3000, err => {
+    if (err) throw err;
+    console.log('Server listening on: http://localhost:3000');
+});
