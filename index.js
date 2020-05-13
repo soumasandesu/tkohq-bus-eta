@@ -5,6 +5,7 @@ const SlackCheck = require("./slackCheck.js");
 const Cached = require("./cached.js");
 const Routes = require("./routes.js");
 const MomentDiff = require("./momentDiff.js");
+const GroupBy = require("./groupBy.js");
 const MessageComposer = require("./messageComposer.js");
 
 const app = express();
@@ -22,9 +23,13 @@ app.get('/', (req, res) => {
 
 const getStopRouteInfo = async function(req, res, _stop, _route) {
     try {
-        const routeKey = `${_stop}_${_route}`.toLowerCase();
-        const route = Routes[routeKey];
-        if (typeof route === "undefined") {
+        const allRoutesInStop = Object.values(Routes)
+            .filter(({ stop, route }) => 
+                stop === _stop.toLowerCase()
+                && (typeof _route === "undefined" || route === _route.toLowerCase())
+            );
+
+        if (allRoutesInStop.length === 0) {
             res.status(400).send({
                 response_type: "client err",
                 text: "❌ Bus stop with specified route unavailable.",
@@ -32,25 +37,21 @@ const getStopRouteInfo = async function(req, res, _stop, _route) {
             return;
         }
 
-        const { func, stopName, routeName } = route;
-        const entries = await Cached(routeKey, func);
+        const routes = await Promise.all(allRoutesInStop
+            .map(async ({ func, stop, route, stopName, routeName }) => ({
+                stop: stopName,
+                route: routeName,
+                etaItems: (await Cached(`${stop}_${route}`, func)).map(m => (
+                    {
+                        remain: MomentDiff(m),
+                        exact: m,
+                    }
+                )),
+            })));
 
-        const msgBlock = MessageComposer({
-            stop: stopName, 
-            routes: [
-                {
-                    route: routeName,
-                    etaItems: entries.map(m => (
-                        {
-                            remain: MomentDiff(m),
-                            exact: m,
-                        }
-                    )),
-                },
-            ],
-        });
+        const msgBlock = Object.entries(GroupBy(routes, "stop")).map(([stop, routes]) => MessageComposer({ stop, routes }));
 
-        res.status(200).send({ blocks: [ msgBlock ] }).end();
+        res.send({ blocks: [ msgBlock ] }).end();
     } catch (e) {
         console.error(e);
         res.status(500).send({
@@ -62,7 +63,9 @@ const getStopRouteInfo = async function(req, res, _stop, _route) {
 }
 
 app.get('/slack', cache('30 seconds'), async (req, res) => {
-    const { text, token: slackToken } = req.query;
+    console.debug("Slack called: ", JSON.stringify(req.query, null, 2));
+
+    const { text, token: slackToken, } = req.query;
 	
 	if (!SlackCheck(slackToken)) {
 		res.status(403).send({
@@ -77,9 +80,25 @@ app.get('/slack', cache('30 seconds'), async (req, res) => {
 });
 
 app.get('/:stop/:route', async (req, res) => {
-    const { stop, route, d: debug } = req.params;
-    if (debug !== "hello") { res.status(204).end(); }
+    const { d: debug } = req.query;
+    if (debug !== "hello") {
+        res.status(204).end();
+        return;
+    }
+
+    const { stop, route } = req.params;
     await getStopRouteInfo(req, res, stop, route);
+});
+
+app.get('/:stop/', async (req, res) => {
+    const { d: debug } = req.query;
+    if (debug !== "hello") {
+        res.status(204).end();
+        return;
+    }
+
+    const { stop } = req.params;
+    await getStopRouteInfo(req, res, stop, undefined);
 });
 
 // ===

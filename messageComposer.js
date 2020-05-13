@@ -22,15 +22,15 @@ module.exports = function({
 			];
 		}
 		return etaItems.map(({ remain, exact }) => ({
-			arrivalTime: exact,
+			remain,
 			text: `${route}\t\t\t\t\t\t${remain} 分鐘\t_(${Moment(exact).format("HH:mm")})_`,
 		}));
 	})
 		.filter(e => e)
-		.sort((a, b) => new Moment(a.arrivalTime).format('YYYYMMDD') - new Moment(b.arrivalTime).format('YYYYMMDD'))
+		.sort((a, b) => a.remain - b.remain)
 		.map(({ text }) => text)
 		.join("\n");
-	const textContent = `*${stop}*\n\n${allLines}`
+	const textContent = `*📍 ${stop}*\n\n${allLines}`
 
 	return ({
 		"type": "section",
