@@ -6,8 +6,10 @@ const cache = new NodeCache( {
 } )
 
 module.exports = async function(key, supplierAsyncFunc) {
+	console.log(`Cache: query = ${key}`);
 	let val = cache.get(key);
 	if (typeof val === "undefined") {
+		console.log(`Cache: ${key} not found in cache, applying supplier...`);
 		val = await supplierAsyncFunc();
 		cache.set(key, val);
 	}
