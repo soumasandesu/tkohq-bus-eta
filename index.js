@@ -1,6 +1,7 @@
 const express = require("express");
 const apicache = require("apicache");
 
+const SlackCheck = require("./slackCheck.js");
 const Cached = require("./cached.js");
 const Routes = require("./routes.js");
 const MomentDiff = require("./momentDiff.js");
@@ -53,14 +54,21 @@ const getStopRouteInfo = async function(req, res, _stop, _route) {
     }
 }
 
-app.get('/slack', async (req, res) => {
-    const { text } = req.query;
+app.get('/slack', cache('30 seconds'), async (req, res) => {
+    const { text, token: slackToken } = req.query;
+	
+	if (!SlackCheck(slackToken)) {
+		res.status(403).send("forbidden").end();
+		return;
+	}
+
     const [ stop, route ] = (text || []).split(" ");
     await getStopRouteInfo(req, res, stop, route);
 });
 
-app.get('/:stop/:route', cache('30 seconds'), async (req, res) => {
-    const { stop, route } = req.params;
+app.get('/:stop/:route', async (req, res) => {
+    const { stop, route, d: debug } = req.params;
+    if (debug !== "hello") { res.status(204).end(); }
     await getStopRouteInfo(req, res, stop, route);
 });
 
