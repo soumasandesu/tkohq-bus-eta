@@ -11,7 +11,7 @@
 			"type": "section",
 			"text": {
                 "type": "mrkdwn",
-				"text": "```\nUsage: /eta [ busStopAlias | busStopAlias [ routeCode ] ]\n\nBus stop alias:\n\tfs\t\t\t\t大赤沙消防局\n\tlp\t\t\t\t日出康城領都\n\nRoute code:\n\t290B\n\t290X\n\t298E\n\t796X\n\t797M\n```"
+				"text": "```\nUsage: /buseta [ busStopAlias | busStopAlias [ routeCode ] ]\n\nBus stop alias:\n\tfs\t\t\t\t大赤沙消防局\n\tlp\t\t\t\t日出康城領都\n\nRoute code:\n\t290B\n\t290X\n\t298E\n\t796X\n\t797M\n```"
 			}
 		},
 		{
