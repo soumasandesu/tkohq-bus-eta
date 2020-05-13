@@ -25,7 +25,10 @@ const getStopRouteInfo = async function(req, res, _stop, _route) {
         const routeKey = `${_stop}_${_route}`.toLowerCase();
         const route = Routes[routeKey];
         if (typeof route === "undefined") {
-            res.status(400).send("❌ Bus stop with specified route unavailable.").end();
+            res.status(400).send({
+                response_type: "client err",
+                text: "❌ Bus stop with specified route unavailable.",
+            }).end();
             return;
         }
 
@@ -47,10 +50,14 @@ const getStopRouteInfo = async function(req, res, _stop, _route) {
             ],
         });
 
-        res.send({ blocks: [ msgBlock ] }).end();
+        res.status(200).send({ blocks: [ msgBlock ] }).end();
     } catch (e) {
         console.error(e);
-        res.status(500).send(e).end();
+        res.status(500).send({
+            response_type: "server err",
+            text: "Error: " + e.message,
+            error: e,
+        }).end();
     }
 }
 
@@ -58,7 +65,10 @@ app.get('/slack', cache('30 seconds'), async (req, res) => {
     const { text, token: slackToken } = req.query;
 	
 	if (!SlackCheck(slackToken)) {
-		res.status(403).send("forbidden").end();
+		res.status(403).send({
+            response_type: "client err",
+            text: "Forbidden",
+        }).end();
 		return;
 	}
 
