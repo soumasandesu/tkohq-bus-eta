@@ -9,18 +9,13 @@ module.exports = function({
 }) {
 	const instant = (new Date()).valueOf();
 
-	const url = `https://cp1.gotowhere.ga/etav3.kmb.hk/?action=geteta&lang=tc&route=${route}&bound=${bound}&stop=${stop}&stop_seq=${stop_seq}&_=${instant}`;
+	const url = `http://etav3.kmb.hk/?action=geteta&lang=tc&route=${route}&bound=${bound}&stop=${stop}&stop_seq=${stop_seq}&_=${instant}`;
 
 	return Fetch(url, {
 		method: "GET",
 		headers: {
-			"Dev-github": "soumasandesu",
-			"Dev-tg": "souma_san_desu",
-			"Dev-call-freq": "max=2/mins;cache-enabled",
-			"Accep": "application/json",
-			"Origin": "https://www.gotowhere.ga",
-			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0",
-			"Referer": "https://www.gotowhere.ga/",
+			"Content-Type": "application/json",
+			"Accept": "application/json",
 		}
 	})
 		.then(res => res.json())

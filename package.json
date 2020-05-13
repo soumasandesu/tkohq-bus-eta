@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "start:test": "nodemon --exec node --inspect-brk index.js"
+    "test": "nodemon --exec node --inspect-brk index.js"
   },
   "devDependencies": {
     "cross-env": "^7.0.2",

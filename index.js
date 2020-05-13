@@ -22,10 +22,10 @@ app.get('/', (req, res) => {
 
 const getStopRouteInfo = async function(req, res, _stop, _route) {
     try {
-        const routeKey = `${_stop}_${_route}`;
+        const routeKey = `${_stop}_${_route}`.toLowerCase();
         const route = Routes[routeKey];
         if (typeof route === "undefined") {
-            res.status(400).send("stop / route undef").end();
+            res.status(400).send("❌ Bus stop with specified route unavailable.").end();
             return;
         }
 
