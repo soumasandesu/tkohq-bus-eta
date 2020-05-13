@@ -26,8 +26,8 @@ const getStopRouteInfo = async function(req, res, _stop, _route) {
     try {
         const allRoutesInStop = Object.values(Routes)
             .filter(({ stop, route }) => 
-                stop === _stop.toLowerCase()
-                && (typeof _route === "undefined" || route === _route.toLowerCase())
+                (_stop.length === 0 || stop === _stop.toLowerCase())
+                && (_route.length === 0 || route === _route.toLowerCase())
             );
 
         if (allRoutesInStop.length === 0) {
@@ -66,7 +66,7 @@ const getStopRouteInfo = async function(req, res, _stop, _route) {
 app.get('/slack', cache('30 seconds'), async (req, res) => {
     console.debug("Slack called: ", JSON.stringify(req.query));
 
-    const { text = "", token: slackToken, } = req.query;
+    const { text = " ", token: slackToken, } = req.query;
 	
 	if (!SlackCheck(slackToken)) {
 		res.status(403).send({
@@ -77,7 +77,7 @@ app.get('/slack', cache('30 seconds'), async (req, res) => {
 	}
 
     const [ stop, route ] = text.split(" ");
-	if (stop.length === 0 && typeof route === "undefined") {
+	if (stop.length === 0 && route.length === 0) {
 		res.status(200).send(HelpDoc).end();
 		return;
 	}
