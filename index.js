@@ -19,13 +19,12 @@ app.get('/', (req, res) => {
 
 // ===
 
-app.get('/:stop/:route', cache('30 seconds'), async (req, res) => {
-
+const getStopRouteInfo = async function(req, res, _stop, _route) {
     try {
-        const routeKey = `${req.params.stop}_${req.params.route}`;
+        const routeKey = `${_stop}_${_route}`;
         const route = Routes[routeKey];
         if (typeof route === "undefined") {
-            res.status(400).end();
+            res.status(400).send("stop / route undef").end();
             return;
         }
 
@@ -52,7 +51,17 @@ app.get('/:stop/:route', cache('30 seconds'), async (req, res) => {
         console.error(e);
         res.status(500).send(e).end();
     }
-    
+}
+
+app.get('/slack', async (req, res) => {
+    const { text } = req.query;
+    const [ stop, route ] = (text || []).split(" ");
+    await getStopRouteInfo(req, res, stop, route);
+});
+
+app.get('/:stop/:route', cache('30 seconds'), async (req, res) => {
+    const { stop, route } = req.params;
+    await getStopRouteInfo(req, res, stop, route);
 });
 
 // ===
