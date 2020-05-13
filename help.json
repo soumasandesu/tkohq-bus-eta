@@ -25,7 +25,7 @@
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "<http://it-catch.hktv.com.hk:10080/charlesp/tkohq-bus-eta|Source code> <http://it-catch.hktv.com.hk:10080/charlesp/tkohq-bus-eta/issues/new|Got issues?>"
+				"text": "<http://it-catch.hktv.com.hk:10080/charlesp/tkohq-bus-eta|Source code>\t\t<http://it-catch.hktv.com.hk:10080/charlesp/tkohq-bus-eta/issues/new|Got issues?>"
 			}
 		}
 	]
