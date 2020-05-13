@@ -31,8 +31,8 @@ const getStopRouteInfo = async function(req, res, _stop, _route) {
             );
 
         if (allRoutesInStop.length === 0) {
-            res.status(400).send({
-                response_type: "client err",
+            res.send({
+                response_type: "ephemeral",
                 text: "❌ 路線-巴士站 配搭不可用",
             }).end();
             return;
@@ -56,7 +56,7 @@ const getStopRouteInfo = async function(req, res, _stop, _route) {
     } catch (e) {
         console.error(e);
         res.status(500).send({
-            response_type: "server err",
+            response_type: "ephemeral",
             text: "Error: " + e.message,
             error: e,
         }).end();
@@ -70,7 +70,7 @@ app.get('/slack', cache('30 seconds'), async (req, res) => {
 	
 	if (!SlackCheck(slackToken)) {
 		res.status(403).send({
-            response_type: "client err",
+            response_type: "ephemeral",
             text: "Forbidden",
         }).end();
 		return;
