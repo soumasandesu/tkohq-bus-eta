@@ -49,9 +49,9 @@ const getStopRouteInfo = async function(req, res, _stop, _route) {
                 )),
             })));
 
-        const msgBlock = Object.entries(GroupBy(routes, "stop")).map(([stop, routes]) => MessageComposer({ stop, routes }));
+        const msgBlocks = Object.entries(GroupBy(routes, "stop")).map(([stop, routes]) => MessageComposer({ stop, routes }));
 
-        res.send({ blocks: [ msgBlock ] }).end();
+        res.send({ blocks: msgBlocks }).end();
     } catch (e) {
         console.error(e);
         res.status(500).send({
