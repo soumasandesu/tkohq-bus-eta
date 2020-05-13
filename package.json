@@ -13,8 +13,8 @@
     "node-fetch": "^2.6.0"
   },
   "scripts": {
-    "start": "node index.js",
-    "test": "nodemon --exec node --inspect-brk index.js"
+    "start": "cross-env SLACK_TOKEN=TEST node index.js",
+    "test": "cross-env SLACK_TOKEN=TEST nodemon --exec node --inspect-brk index.js"
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
