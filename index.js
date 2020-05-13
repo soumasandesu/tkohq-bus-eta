@@ -64,7 +64,7 @@ const getStopRouteInfo = async function(req, res, _stop, _route) {
 }
 
 app.get('/slack', cache('30 seconds'), async (req, res) => {
-    console.debug("Slack called: ", JSON.stringify(req.query, null, 2));
+    console.debug("Slack called: ", JSON.stringify(req.query));
 
     const { text = "", token: slackToken, } = req.query;
 	
@@ -81,7 +81,6 @@ app.get('/slack', cache('30 seconds'), async (req, res) => {
 		res.status(200).send(HelpDoc).end();
 		return;
 	}
-
 
     await getStopRouteInfo(req, res, stop, route);
 });
