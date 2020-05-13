@@ -26,8 +26,8 @@ const getStopRouteInfo = async function(req, res, _stop, _route) {
     try {
         const allRoutesInStop = Object.values(Routes)
             .filter(({ stop, route }) => 
-                (_stop.length === 0 || stop === _stop.toLowerCase())
-                && (_route.length === 0 || route === _route.toLowerCase())
+                (_stop === "*" || stop === _stop.toLowerCase())
+                && (_route === "" || route === _route.toLowerCase())
             );
 
         if (allRoutesInStop.length === 0) {

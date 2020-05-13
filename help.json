@@ -11,14 +11,14 @@
 			"type": "section",
 			"text": {
                 "type": "mrkdwn",
-				"text": "```\nUsage: /buseta [ busStopAlias | busStopAlias [ routeCode ] ]\n\nBus stop alias:\n\tfs\t\t\t\t大赤沙消防局\n\tlp\t\t\t\t日出康城領都\n\nRoute code:\n\t290B\n\t290X\n\t298E\n\t796X\n\t797M\n```"
+				"text": "```\nUsage: /buseta [ busStopAlias | * ] ?[ routeCode ]\n\nBus stop alias:\n\tfs\t\t\t\t大赤沙消防局\n\tlp\t\t\t\t日出康城領都\n\nRoute code:\n\t290B\n\t290X\n\t298E\n\t796X\n\t797M\n```"
 			}
 		},
 		{
 			"type": "section",
 			"text": {
                 "type": "mrkdwn",
-				"text": "*Example*:\n\n➡ 查詢指定巴士站各路線的 ETA\n`/buseta lp` (日出康城領都)\n`/buseta FS` (大赤沙消防局，大小寫不分)\n\n\n\n➡ 查詢指定巴士、指定路線的 ETA\n`/buseta FS 797M` (797M@大赤沙消防局，大小寫不分)\n`/buseta lp 796x` (796X@日出康城領都)\n\n\n\n"
+				"text": "*Example*:\n\n➡ 查詢指定巴士站各路線的 ETA\n`/buseta lp` (日出康城領都)\n`/buseta FS` (大赤沙消防局，大小寫不分)\n\n\n\n➡ 查詢指定巴士、指定路線的 ETA\n`/buseta FS 797M` (797M@大赤沙消防局，大小寫不分)\n`/buseta lp 796x` (796X@日出康城領都)\n\n\n\n➡ 查詢指定路線各站的 ETA\n`/buseta * 298e`"
 			}
 		},
 		{
