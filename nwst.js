@@ -17,6 +17,6 @@ module.exports = function({
 		}
 	})
 		.then(res => res.json())
-		.then(json => json.data.map(d => d.eta).map(strDate => Moment(strDate)));
-		// list of strDate("2020-05-12T16:55:35+08:00")
+		.then(json => json.data.map(d => d.eta).map(strDate => Moment(strDate).utcOffset(8)));
+		// list of strDate("2020-05-15T12:09:00+08:00")
 };
