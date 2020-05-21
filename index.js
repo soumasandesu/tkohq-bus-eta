@@ -90,7 +90,7 @@ app.get('/slack', cache('30 seconds'), async (req, res) => {
 		return;
 	}
 
-    SlackLateMsgDefaults(req, res, () => getStopRouteInfo(stop, route));
+    await SlackLateMsgDefaults(req, res, () => getStopRouteInfo(stop, route));
 });
 
 app.get('/:stop/:route', async (req, res) => {

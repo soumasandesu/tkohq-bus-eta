@@ -15,7 +15,8 @@
   },
   "scripts": {
     "start": "cross-env SLACK_TOKEN=TEST node index.js",
-    "test": "cross-env SLACK_TOKEN=TEST nodemon --exec node --inspect-brk index.js"
+    "test": "cross-env SLACK_TOKEN=TEST nodemon --exec node --inspect-brk index.js",
+    "p": "git add . && git commit -m 懶 && git push origin master"
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
