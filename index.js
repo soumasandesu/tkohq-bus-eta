@@ -1,6 +1,4 @@
-const ApiCache = require("apicache");
 const Express = require("express");
-const Fetch = require("node-fetch");
 
 const Cached = require("./cached.js");
 const GroupBy = require("./groupBy.js");
@@ -12,11 +10,6 @@ const SlackCheck = require("./slackCheck.js");
 const SlackLateMsgDefaults = require("./slackLateMsgDefaults.js");
 
 const app = Express();
-const cache = ApiCache.options({
-    headers: {
-        'cache-control': 'no-cache',
-    },
-}).middleware;
 
 app.get('/', (req, res) => {
     res.json("ok");
@@ -71,10 +64,14 @@ const getStopRouteInfoAndRespond = async function(req, res, _stop, _route) {
     }
 }
 
-app.get('/slack', cache('30 seconds'), async (req, res) => {
+app.get('/slack', async (req, res) => {
     console.debug("Slack called: ", JSON.stringify(req.query));
 
-    const { text = "", token: slackToken, response_url: responseUrl } = req.query;
+    const {
+        text = "",
+        token: slackToken,
+        response_url: responseUrl,
+    } = req.query;
 	
 	if (!SlackCheck(slackToken)) {
 		res.status(403).send({
@@ -90,7 +87,7 @@ app.get('/slack', cache('30 seconds'), async (req, res) => {
 		return;
 	}
 
-    await SlackLateMsgDefaults(req, res, () => getStopRouteInfo(stop, route));
+    await SlackLateMsgDefaults(req, res, () => getStopRouteInfo(stop, route), responseUrl);
 });
 
 app.get('/:stop/:route', async (req, res) => {
