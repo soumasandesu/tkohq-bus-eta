@@ -43,13 +43,11 @@ module.exports = async function(req, res, asyncMsgBodySupplier, responseUrl) {
             .end();
 
         const msg = await asyncMsgBodySupplier();
-        Fetch(responseUrl, {
+        return Fetch(responseUrl, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-            },
             body: msg,
-        });
+        })
+            .then(res => res.text())
+            .then(text => `ret to ${responseUrl} done, res = ${text}`);
     }
 };
