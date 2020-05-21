@@ -1,5 +1,5 @@
 const KMB = require("./kmb.js");
-const NWFB = require("./nwfb.js");
+const NWFB = require("./nwst_web_nwp3.js");
 
 module.exports = {
 	"fs_298e": {

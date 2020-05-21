@@ -1,4 +1,4 @@
-const nwst = require("./nwst.js");
+const nwst = require("./nwst_datagov.js");
 
 module.exports = function(params) {
 	return nwst({

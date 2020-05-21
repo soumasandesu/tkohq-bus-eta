@@ -1,16 +1,18 @@
-const express = require("express");
-const apicache = require("apicache");
+const ApiCache = require("apicache");
+const Express = require("express");
+const Fetch = require("node-fetch");
 
-const HelpDoc = require("./help.json");
-const SlackCheck = require("./slackCheck.js");
 const Cached = require("./cached.js");
-const Routes = require("./routes.js");
-const MomentDiff = require("./momentDiff.js");
 const GroupBy = require("./groupBy.js");
+const HelpDoc = require("./help.json");
 const MessageComposer = require("./messageComposer.js");
+const MomentDiff = require("./momentDiff.js");
+const Routes = require("./routes.js");
+const SlackCheck = require("./slackCheck.js");
+const SlackLateMsgDefaults = require("./slackLateMsgDefaults.js");
 
-const app = express();
-const cache = apicache.options({
+const app = Express();
+const cache = ApiCache.options({
     headers: {
         'cache-control': 'no-cache',
     },
@@ -22,37 +24,43 @@ app.get('/', (req, res) => {
 
 // ===
 
-const getStopRouteInfo = async function(req, res, _stop, _route) {
+const getStopRouteInfo = async function(_stop, _route) {
+    const allRoutesInStop = Object.values(Routes)
+        .filter(({ stop, route }) => 
+            (_stop === "*" || stop === _stop.toLowerCase())
+            && (_route === "" || route === _route.toLowerCase())
+        );
+
+    if (allRoutesInStop.length === 0) {
+        res.send({
+            response_type: "ephemeral",
+            text: "❌ 路線-巴士站 配搭不可用",
+        }).end();
+        return;
+    }
+
+    const routes = await Promise.all(allRoutesInStop
+        .map(async ({ func, stop, route, stopName, routeName }) => ({
+            stop: stopName,
+            route: routeName,
+            etaItems: (await Cached(`${stop}_${route}`, func)).map(m => (
+                {
+                    remain: MomentDiff(m),
+                    exact: m,
+                }
+            )),
+        })));
+
+    const msgBlocks = Object.entries(GroupBy(routes, "stop")).map(([stop, routes]) => MessageComposer({ stop, routes }));
+
+    return { blocks: msgBlocks };
+};
+
+const getStopRouteInfoAndRespond = async function(req, res, _stop, _route) {
     try {
-        const allRoutesInStop = Object.values(Routes)
-            .filter(({ stop, route }) => 
-                (_stop === "*" || stop === _stop.toLowerCase())
-                && (_route === "" || route === _route.toLowerCase())
-            );
+        const stopRouteInfoMsg = await getStopRouteInfo(_stop, _route);
 
-        if (allRoutesInStop.length === 0) {
-            res.send({
-                response_type: "ephemeral",
-                text: "❌ 路線-巴士站 配搭不可用",
-            }).end();
-            return;
-        }
-
-        const routes = await Promise.all(allRoutesInStop
-            .map(async ({ func, stop, route, stopName, routeName }) => ({
-                stop: stopName,
-                route: routeName,
-                etaItems: (await Cached(`${stop}_${route}`, func)).map(m => (
-                    {
-                        remain: MomentDiff(m),
-                        exact: m,
-                    }
-                )),
-            })));
-
-        const msgBlocks = Object.entries(GroupBy(routes, "stop")).map(([stop, routes]) => MessageComposer({ stop, routes }));
-
-        res.send({ blocks: msgBlocks }).end();
+        res.send(stopRouteInfoMsg).end();
     } catch (e) {
         console.error(e);
         res.status(500).send({
@@ -66,7 +74,7 @@ const getStopRouteInfo = async function(req, res, _stop, _route) {
 app.get('/slack', cache('30 seconds'), async (req, res) => {
     console.debug("Slack called: ", JSON.stringify(req.query));
 
-    const { text = "", token: slackToken, } = req.query;
+    const { text = "", token: slackToken, response_url: responseUrl } = req.query;
 	
 	if (!SlackCheck(slackToken)) {
 		res.status(403).send({
@@ -82,7 +90,7 @@ app.get('/slack', cache('30 seconds'), async (req, res) => {
 		return;
 	}
 
-    await getStopRouteInfo(req, res, stop, route);
+    SlackLateMsgDefaults(req, res, () => getStopRouteInfo(stop, route));
 });
 
 app.get('/:stop/:route', async (req, res) => {
@@ -93,7 +101,7 @@ app.get('/:stop/:route', async (req, res) => {
     }
 
     const { stop, route } = req.params;
-    await getStopRouteInfo(req, res, stop, route);
+    await getStopRouteInfoAndRespond(req, res, stop, route);
 });
 
 app.get('/:stop/', async (req, res) => {
@@ -104,7 +112,7 @@ app.get('/:stop/', async (req, res) => {
     }
 
     const { stop } = req.params;
-    await getStopRouteInfo(req, res, stop, undefined);
+    await getStopRouteInfoAndRespond(req, res, stop, undefined);
 });
 
 // ===
