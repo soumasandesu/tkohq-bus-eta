@@ -1,5 +1,4 @@
 const Delay = require("delay");
-const PromiseValue = require("promise-value");
 
 module.exports = function(req, res, asyncMsgBodySupplier, responseUrl) {
     const defaultMsgSupplier = async () => {
