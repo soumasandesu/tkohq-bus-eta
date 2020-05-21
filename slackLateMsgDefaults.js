@@ -22,29 +22,34 @@ module.exports = async function(req, res, asyncMsgBodySupplier, responseUrl) {
             asyncMsgBodySupplier,
             Delay.reject(1000)
         ]);
+
+        console.log("on time, ret now")
         res.status(200).send(msg).end();
     } catch (_) {
-        res.status(200).send({
-            "blocks": [
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "_Loading..._"
-                    }
-                }
-            ]
-        }).end();
+        console.log(`too late, ret to ${responseUrl} later`);
+
+        res.status(200)
+            // .send({
+            //     "blocks": [
+            //         {
+            //             "type": "section",
+            //             "text": {
+            //                 "type": "mrkdwn",
+            //                 "text": "*查詢巴士到站時間*"
+            //             }
+            //         }
+            //     ]
+            // })
+            .end();
 
         const msg = await asyncMsgBodySupplier();
-        const fetch = await Fetch(responseUrl, {
+        Fetch(responseUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
             },
-            body: msg
+            body: msg,
         });
-        return fetch;
     }
 };
